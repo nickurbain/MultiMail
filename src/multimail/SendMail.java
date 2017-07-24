@@ -26,7 +26,7 @@ public class SendMail {
 	public void send()
 	{
 		final String username = "multimailtestmail@gmail.com";
-		final String password = "MuMate55p";
+		final String password = "";
 		
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
