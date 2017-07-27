@@ -1,5 +1,8 @@
 package multimail;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -14,19 +17,31 @@ public class SendMail {
 	
 	private static final String SMTPSERVER = "smtp.gmail.com";
 	private static final String SMTPPORT = "25";
+	
+	private Properties config;
 	String body;
 	String addresses;
 	
+	/**
+	 * 
+	 * @param recipient email address
+	 * @param message
+	 */
 	public SendMail(String recipient, String message)
 	{
 		addresses = recipient;
 		body = message;
 	}
 	
-	public void send()
+	public void send() throws IOException
 	{
-		final String username = "multimailtestmail@gmail.com";
-		final String password = "";
+		String username, password;
+		//read username and password from a config file so that I can use git
+		FileInputStream in = new FileInputStream("config");
+		config = new Properties();
+		config.load(in);
+		username = config.getProperty("username");
+		password = config.getProperty("password");
 		
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
@@ -48,8 +63,6 @@ public class SendMail {
 			message.setText(body);
 			
 			Transport.send(message);
-			
-			System.out.println("Done");
 			
 		} catch(MessagingException e){
 			throw new RuntimeException(e);

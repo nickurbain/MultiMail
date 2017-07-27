@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -76,6 +77,7 @@ public class MultiMail implements ActionListener{
 		templateLabel = new JLabel("Template ");
 		
 		templateComboBox = new JComboBox(templates);
+		//Add template text to messageTextArea from templateComboBox
 		templateComboBox.addItemListener(new ItemListener(){
 			@Override
 			public void itemStateChanged(ItemEvent e){
@@ -98,41 +100,30 @@ public class MultiMail implements ActionListener{
 		//TELEPHONE NUMBER
 		gc.gridx = 0;
 		gc.gridy = 0;
-		gc.ipadx = 1;
-		gc.ipady = 1;
 		frame.add(numberLabel, gc);
 		
 		gc.gridx = 1;
 		gc.gridy = 0;
-		gc.ipadx = 1;
-		gc.ipady = 1;
 		frame.add(numberTextField, gc);
 		
 		//TEMPLATE SELECTION
 		gc.gridx = 2;
 		gc.gridy = 1;
-		gc.ipadx = 1;
-		gc.ipady = 1;
 		frame.add(templateLabel);
 		
 		gc.gridx = 2;
 		gc.gridy = 2;
-		gc.ipadx = 1;
-		gc.ipady = 1;
 		frame.add(templateComboBox);
 		
 		
 		//MESSAGE BOX
 		gc.gridx = 0;
 		gc.gridy = 2;
-		gc.ipadx = 1;
-		gc.ipady = 1;
 		frame.add(messageLabel, gc);
 		
+		//Character Counter
 		gc.gridx = 1;
 		gc.gridy = 2;
-		gc.ipadx = 1;
-		gc.ipady = 1;
 		messageTextArea.getDocument().addDocumentListener(new DocumentListener(){
 
 			@Override
@@ -157,12 +148,9 @@ public class MultiMail implements ActionListener{
 		});
 		frame.add(messageTextArea, gc);
 		
-		//GO BUTTON
-		
+		//SEND BUTTON
 		gc.gridx = 1;
 		gc.gridy = 3;
-		gc.ipadx = 1;
-		gc.ipady = 1;
 		frame.add(numberButton, gc);
 		numberButton.addActionListener(this);
 		
@@ -178,19 +166,27 @@ public class MultiMail implements ActionListener{
 		String address = numberTextField.getText();
 		tta = new TelToAddress(address);
 		
+		//If there is no message, copy the phone number as addresses to the clipboard
 		if(body.equals("") || body.equals(" ")){
 			address = tta.transform(0);
 			StringSelection stringSelection = new StringSelection(address);
 			Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clpbrd.setContents(stringSelection, null);
 			message = "Address copied to clipboard!";
+		//Otherwise send email's out to those addresses
 		}else{
 			address = tta.transform(1);
 			mail = new SendMail(address, body.replaceAll("[\r\n]+", " "));
-			mail.send();
-			message = "Text message has been sent";
+			try {
+				mail.send();
+				message = "Text message has been sent";
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				message = "Config file error";
+				e1.printStackTrace();
+			}
 		}
-		
+		//Message box to display an error or success
 		JOptionPane.showMessageDialog(frame, message);
 	}
 }

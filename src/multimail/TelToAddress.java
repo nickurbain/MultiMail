@@ -18,6 +18,10 @@ public class TelToAddress {
 		Addresses = "";
 	}
 	
+	/**
+	 * @param type 0 for copy to clipboard format, 1 for sending.
+	 * @return
+	 */
 	public String transform(int type)
 	{
 		parse();
